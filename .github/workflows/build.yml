@@ -1,0 +1,25 @@
+name: Build
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  prod-build:
+    name: Production build solution
+    if: ${{ github.ref_name == 'master' }}
+    uses: ads102003/Actions/.github/workflows/project-build.yml@main
+    with:
+      version-prefix: '2.0'
+      project-name: Oxide.Core
+    secrets: inherit
+
+  dev-build:
+    name: Development build solution
+    if: ${{ github.ref_name != 'master' }}
+    uses: ads102003/Actions/.github/workflows/project-build.yml@main
+    with:
+      branch-postfix: "-${{ github.ref_name }}"
+      version-prefix: '2.0'
+      project-name: Oxide.Core
+    secrets: inherit
