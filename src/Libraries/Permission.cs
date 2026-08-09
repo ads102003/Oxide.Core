@@ -401,7 +401,7 @@ namespace Oxide.Core.Libraries
                         return registeredPermissions.Values.SelectMany(v => v).Any(p => p.StartsWith(permission.TrimEnd('*'), StringComparison.OrdinalIgnoreCase));
                     }
                 }
-                return registeredPermissions.Values.Any(v => v.Contains(permission, StringComparer.OrdinalIgnoreCase));
+                return registeredPermissions.Values.Any(v => v.Contains(permission));
             }
 
             if (!registeredPermissions.TryGetValue(owner, out HashSet<string> set))
@@ -421,7 +421,7 @@ namespace Oxide.Core.Libraries
                     return set.Any(p => p.StartsWith(permission.TrimEnd('*'), StringComparison.OrdinalIgnoreCase));
                 }
             }
-            return set.Contains(permission, StringComparer.OrdinalIgnoreCase);
+            return set.Contains(permission);
         }
 
         #endregion Permission Management
@@ -500,7 +500,18 @@ namespace Oxide.Core.Libraries
         /// <param name="permission"></param>
         /// <returns></returns>
         [LibraryFunction("GroupsHavePermission")]
-        public bool GroupsHavePermission(HashSet<string> groupNames, string permission) => groupNames.Any(g => GroupHasPermission(g, permission));
+        public bool GroupsHavePermission(HashSet<string> groupNames, string permission)
+        {
+            foreach (string groupName in groupNames)
+            {
+                if (GroupHasPermission(groupName, permission))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
 
         /// <summary>
         /// Returns if the specified group has the specified permission or not
@@ -522,7 +533,7 @@ namespace Oxide.Core.Libraries
                 return false;
             }
 
-            return groupData.Perms.Contains(permission, StringComparer.OrdinalIgnoreCase) || GroupHasPermission(groupData.ParentGroup, permission);
+            return groupData.Perms.Contains(permission) || GroupHasPermission(groupData.ParentGroup, permission);
         }
 
         /// <summary>
@@ -549,7 +560,7 @@ namespace Oxide.Core.Libraries
             UserData userData = GetUserData(playerId);
 
             // Check if they have the permission
-            if (userData.Perms.Contains(permission, StringComparer.OrdinalIgnoreCase))
+            if (userData.Perms.Contains(permission))
             {
                 return true;
             }
@@ -638,7 +649,7 @@ namespace Oxide.Core.Libraries
 
             foreach (KeyValuePair<string, UserData> data in usersData)
             {
-                if (data.Value.Perms.Contains(permission, StringComparer.OrdinalIgnoreCase))
+                if (data.Value.Perms.Contains(permission))
                 {
                     permissionUsers.Add($"{data.Key}({data.Value.LastSeenNickname})");
                 }
@@ -664,7 +675,7 @@ namespace Oxide.Core.Libraries
 
             foreach (KeyValuePair<string, GroupData> data in groupsData)
             {
-                if (data.Value.Perms.Contains(permission, StringComparer.OrdinalIgnoreCase))
+                if (data.Value.Perms.Contains(permission))
                 {
                     permissionGroups.Add(data.Key);
                 }
@@ -748,7 +759,7 @@ namespace Oxide.Core.Libraries
                 return false;
             }
 
-            return GetUserData(playerId).Groups.Contains(groupName, StringComparer.OrdinalIgnoreCase);
+            return GetUserData(playerId).Groups.Contains(groupName);
         }
 
         /// <summary>
@@ -798,7 +809,7 @@ namespace Oxide.Core.Libraries
                 return new string[0];
             }
 
-            return usersData.Where(u => u.Value.Groups.Contains(groupName, StringComparer.OrdinalIgnoreCase)).Select(u => $"{u.Key} ({u.Value.LastSeenNickname})").ToArray();
+            return usersData.Where(u => u.Value.Groups.Contains(groupName)).Select(u => $"{u.Key} ({u.Value.LastSeenNickname})").ToArray();
         }
 
         /// <summary>
@@ -1245,7 +1256,7 @@ namespace Oxide.Core.Libraries
                 return true;
             }
 
-            if (!GroupExists(parentGroupName) || groupName.Equals(parentGroupName))
+            if (!GroupExists(parentGroupName) || groupName.Equals(parentGroupName, StringComparison.OrdinalIgnoreCase))
             {
                 return false;
             }
@@ -1276,7 +1287,7 @@ namespace Oxide.Core.Libraries
                 return false;
             }
 
-            HashSet<string> groupNames = new HashSet<string> { groupName, parentGroupName };
+            HashSet<string> groupNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { groupName, parentGroupName };
 
             // Check for circular reference
             while (!string.IsNullOrEmpty(parentGroupData.ParentGroup))
