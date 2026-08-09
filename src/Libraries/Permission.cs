@@ -24,12 +24,12 @@ namespace Oxide.Core.Libraries
         /// <summary>
         /// Gets or sets the individual permissions for this player
         /// </summary>
-        public HashSet<string> Perms { get; set; } = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        public HashSet<string> Perms { get; internal set; } = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
         /// <summary>
         /// Gets or sets the group for this player
         /// </summary>
-        public HashSet<string> Groups { get; set; } = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        public HashSet<string> Groups { get; internal set; } = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
     }
 
     /// <summary>
@@ -51,7 +51,7 @@ namespace Oxide.Core.Libraries
         /// <summary>
         /// Gets or sets the individual permissions for this group
         /// </summary>
-        public HashSet<string> Perms { get; set; } = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        public HashSet<string> Perms { get; internal set; } = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
         /// <summary>
         /// Gets or sets the parent for this group
